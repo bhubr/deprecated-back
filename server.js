@@ -1,16 +1,41 @@
+var Promise    = require('bluebird');
 var express    = require('express');
 var mysql      = require('promise-mysql');
-var Promise    = require('bluebird');
-var app        = express();
-var config     = require(__dirname + '/config.json');
 var pluralize  = require('pluralize')
 var _          = require('lodash');
+var bodyParser = require('body-parser');
+var config     = require(__dirname + '/config.json');
+var app        = express();
+
+// Instantiate Chance so it can be used
+var Chance     = require('chance');
+var chance = new Chance();
+
 var connection;
 mysql.createConnection(config.db).then(function(conn){
     connection = conn;
 });
 
+// parse various different custom JSON types as JSON
+// Ember REST adapter uses bloody vnd.api+json, fuck it
+app.use(bodyParser.json({ type: 'application/*+json' }))
+
+function errHandler(err) {
+  console.log('** Error **');
+  console.log(err);
+}
+
 function processRow(row) {
+  var output = {}
+  for (k in row) {
+    if (k === 'id') continue;
+    var dashed = k.replace('_', '-');
+    output[dashed] = row[k];
+  }
+  return output;
+}
+
+function processRowReverse(row) {
   var output = {}
   for (k in row) {
     if (k === 'id') continue;
@@ -34,7 +59,7 @@ function genericReadHandler(tableName) {
 }
 
 app.get('/users', function (req, res) {
-  connection.query('SELECT * from user')
+  connection.query('SELECT * FROM user')
   .then(genericReadHandler('user'))
   .then(function(users) {
     res.json({ data: users });
@@ -42,53 +67,39 @@ app.get('/users', function (req, res) {
   .catch(function(err) {
     console.log('Error', err);
   });
+});
 
-  // var users = [
-  //   {
-  //     type: 'users',
-  //     id: 1,
-  //     attributes: {
-  //       "first-name": 'Bernie',
-  //       "last-name": 'Sanders',
-  //       "birth-date": '1941-09-08'
-  //     }
-  //   },
-  //   {
-  //     type: 'users',
-  //     id: 2,
-  //     attributes: {
-  //       "first-name": 'Hillary',
-  //       "last-name": 'Clinton',
-  //       "birth-date": '1947-10-26'
-  //     }
-  //   },
-  //   {
-  //     type: 'users',
-  //     id: 3,
-  //     attributes: {
-  //       "first-name": 'Donald',
-  //       "last-name": 'Trump',
-  //       "birth-date": '1946-06-14'
-  //     }
-  //   },
-  //   {
-  //     type: 'users',
-  //     id: 4,
-  //     attributes: {
-  //       "first-name": 'George',
-  //       "last-name": 'Bush',
-  //       "birth-date": '1924-06-12'
-  //     }
-  //   }
-  // ];
-  // var payload = {
-  //   data: users
+app.post('/users', bodyParser.json(), function(req, res) {
+  // console.log(req.body);
+  // var user = {
+  //   firstName: chance.first(),
+  //   lastName:  chance.last(),
+  //   birthDate: (chance.birthday()).toISOString().substring(0, 10)
   // };
-  // res.json(payload);
+  var rawAttrs = processRowReverse(req.body.data.attributes);
+  var userAttrs = _.values(rawAttrs);
+  var quotedAttrs = _.map(userAttrs, function(attr) {
+    return "'" + attr + "'";
+  })
+  var values = quotedAttrs.join(',');
+  var query = 'INSERT INTO user(first_name,last_name,birth_date) VALUES(' + values + ')';
+  console.log(query);
+  connection.query(query)
+  .then(function(entry) {
+    connection.query('SELECT * FROM user WHERE id=' + entry.insertId)
+      .then(genericReadHandler('user'))
+      .then(function(users) {
+        res.json({ data: users });
+      })
+      .catch(function(err) {
+        console.log('Error', err);
+      });
+  })
+  .catch(errHandler);
 });
 
 app.get('/activities', function(req, res) {
-  connection.query('SELECT name,slug,color from activity')
+  connection.query('SELECT name,slug,color FROM activity')
   .then(function(rows, fields) {
     // if (err) throw err;
 
