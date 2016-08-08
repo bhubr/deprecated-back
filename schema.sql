@@ -8,9 +8,11 @@ DROP TABLE IF EXISTS activity;
 -- Creation
 CREATE TABLE user (
 	id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	user_name VARCHAR(48),
 	first_name VARCHAR(48),
 	last_name VARCHAR(48),
-	birth_date DATE
+	birth_date DATE,
+	password VARCHAR(128)
 );
 
 CREATE TABLE activity (
