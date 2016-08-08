@@ -1,5 +1,17 @@
-var express = require('express');
-var app = express();
+var express    = require('express');
+var mysql      = require('promise-mysql');
+var Promise    = require('bluebird');
+var app        = express();
+var config     = require(__dirname + '/config.json');
+var connection;
+mysql.createConnection(config.db).then(function(conn){
+    connection = conn;
+});
+
+
+// connection.connect();
+
+// connection.end();
 
 app.get('/users', function (req, res) {
   var users = [
@@ -44,6 +56,19 @@ app.get('/users', function (req, res) {
     data: users
   };
   res.json(payload);
+});
+
+app.get('/activities', function(req, res) {
+  connection.query('SELECT name,slug,color from activity')
+  .then(function(rows, fields) {
+    // if (err) throw err;
+
+    res.json(rows[0]);
+  })
+  .catch(function(err) {
+    console.log('Error', err);
+  });
+
 });
 
 app.listen(3000, function () {

@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "express": "^4.x"
+    "bluebird": "^3.4.1",
+    "express": "^4.x",
+    "mysql": "^2.11.1",
+    "promise-mysql": "^1.3.2"
   }
 }
