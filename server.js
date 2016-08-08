@@ -124,6 +124,17 @@ app.get('/users', function (req, res) {
   });
 });
 
+app.get('/users/:id', function (req, res) {
+  connection.query('SELECT * FROM user WHERE id = ' + req.params.id)
+  .then(genericReadHandler('user'))
+  .then(function(users) {
+    res.json({ data: users[0] });
+  })
+  .catch(function(err) {
+    console.log('Error', err);
+  });
+});
+
 
 
 app.post('/users', bodyParser.json(), function(req, res) {
