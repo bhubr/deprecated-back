@@ -1,9 +1,8 @@
-/**
- * DB fields (snake_case) <=> JSON API conversion (kebab-case)
- */
+import pluralize from 'pluralize';
+import _ from 'lodash';
 
 /**
- *
+ * DB fields (snake_case) <=> JSON API conversion (kebab-case)
  */
 function dashLoToHi(row) {
   let output = {};
@@ -16,6 +15,9 @@ function dashLoToHi(row) {
   return output;
 }
 
+/**
+ * JSON API conversion (kebab-case) <=> DB fields (snake_case)
+ */
 function dashHiToLo(row) {
   let output = {};
   for (let k in row) {
@@ -26,8 +28,22 @@ function dashHiToLo(row) {
   return output;
 }
 
+function DbRowsToJSON(tableName) {
+  return function(rows) {
+    var plural = pluralize(tableName);
+    return _.map(rows, function(row) {
+      return {
+        type: plural,
+        id: row.id,
+        attributes: dashLoToHi(row)
+      }
+    });
+  }
+}
+
 
 export default {
   dashLoToHi,
-  dashHiToLo
+  dashHiToLo,
+  DbRowsToJSON
 }

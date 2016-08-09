@@ -1,4 +1,8 @@
-var Promise    = require('bluebird');
+import Promise   from 'bluebird';
+import bcrypt    from 'bcrypt';
+import auth      from './services/auth';
+import RestUtils from './services/rest-utils';
+
 var express    = require('express');
 var mysql      = require('promise-mysql');
 var pluralize  = require('pluralize')
@@ -6,18 +10,19 @@ var _          = require('lodash');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var session    = require('express-session')
-var bcrypt     = require('bcrypt');
+
 var passport   = require('passport');
 var Strategy   = require('passport-local').Strategy;
 var config     = require(__dirname + '/config.json');
 var app        = express();
+
 var saltRounds = 10;
 // Instantiate Chance so it can be used
 // var Chance     = require('chance');
 // var chance     = new Chance();
 var connection;
 
-bcrypt.hashAsync = Promise.promisify(bcrypt.hash);
+
 bcrypt.compareAsync = Promise.promisify(bcrypt.compare);
 
 mysql.createConnection(config.db).then(function(conn){
@@ -42,38 +47,8 @@ function errHandler(err) {
   console.log(err);
 }
 
-function processRow(row) {
-  var output = {}
-  for (k in row) {
-    if (k === 'id') continue;
-    var dashed = k.replace('_', '-');
-    output[dashed] = row[k];
-  }
-  return output;
-}
 
-function processRowReverse(row) {
-  var output = {}
-  for (k in row) {
-    if (k === 'id') continue;
-    var dashed = k.replace('_', '-');
-    output[dashed] = row[k];
-  }
-  return output;
-}
 
-function genericReadHandler(tableName) {
-  return function(rows) {
-    var plural = pluralize(tableName);
-    return _.map(rows, function(row) {
-      return {
-        type: plural,
-        id: row.id,
-        attributes: processRow(row)
-      }
-    });
-  }
-}
 
 passport.use(new Strategy(
   function(username, password, cb) {
@@ -115,7 +90,7 @@ passport.deserializeUser(function(user, cb) {
 
 app.get('/users', function (req, res) {
   connection.query('SELECT * FROM user')
-  .then(genericReadHandler('user'))
+  .then(RestUtils.DbRowsToJSON('user'))
   .then(function(users) {
     res.json({ data: users });
   })
@@ -126,7 +101,7 @@ app.get('/users', function (req, res) {
 
 app.get('/users/:id', function (req, res) {
   connection.query('SELECT * FROM user WHERE id = ' + req.params.id)
-  .then(genericReadHandler('user'))
+  .then(RestUtils.DbRowsToJSON('user'))
   .then(function(users) {
     res.json({ data: users[0] });
   })
@@ -136,39 +111,16 @@ app.get('/users/:id', function (req, res) {
 });
 
 
-
 app.post('/users', bodyParser.json(), function(req, res) {
-  var rawAttrs = processRowReverse(req.body.data.attributes);
-  var rawPass = rawAttrs.password;
-  delete rawAttrs.password;
-  var userAttrs = _.values(rawAttrs);
-  bcrypt.hashAsync(rawPass, saltRounds)
-  .then(function(hash) {
-    userAttrs.push(hash);
-    var quotedAttrs = _.map(userAttrs, function(attr) {
-      return "'" + attr + "'";
-    })
-    var values = quotedAttrs.join(',');
-    var query = 'INSERT INTO user(user_name,first_name,last_name,birth_date,password) VALUES(' + values + ')';
-    console.log(query);
-    connection.query(query)
-    .then(function(entry) {
-      connection.query('SELECT * FROM user WHERE id=' + entry.insertId)
-        .then(genericReadHandler('user'))
-        .then(function(users) {
-          res.json({ data: users });
-        })
-        .catch(function(err) {
-          console.log('Error', err);
-        });
-    })
-    .catch(errHandler);
+  const converter = RestUtils.DbRowsToJSON('user');
+  return auth.register(connection, req.body.data.attributes)
+  .then(converter)
+  .then(function(users) {
+    res.json({ data: users });
   })
   .catch(function(err) {
-    console.log('Err occured while encrypting pass:', err);
+    console.log('Error', err);
   });
-
-  
 });
 
 app.post('/auth/login',
