@@ -21,7 +21,7 @@ function register(connection, attributes) {
   .then(hashedPassword => {
     attributes.password = hashedPassword;
     const query = DbUtils.payloadToQuery('user', attributes);
-    console.log('Query', query);
+    console.log('Register user query:', query);
     return connection.query(query)
     .then(function(entry) {
       return connection.query('SELECT * FROM user WHERE id=' + entry.insertId);

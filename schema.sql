@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS activity;
 -- Creation
 CREATE TABLE user (
 	id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	email VARCHAR(48),
 	user_name VARCHAR(48),
 	first_name VARCHAR(48),
 	last_name VARCHAR(48),
