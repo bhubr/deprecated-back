@@ -15,9 +15,6 @@ var Strategy   = require('passport-local').Strategy;
 var config     = require(__dirname + '/config.json');
 var app        = express();
 
-var saltRounds = 10;
-var connection;
-
 
 bcrypt.compareAsync = Promise.promisify(bcrypt.compare);
 
@@ -41,41 +38,7 @@ function errHandler(err) {
 
 
 
-passport.use(new Strategy(
-  function(email, password, cb) {
-    console.log("SELECT * FROM user WHERE email = '" + email + "'");
-    connection.query("SELECT * FROM user WHERE email = '" + email + "'")
-    .then(function(users) {
-      var user = users[0];
-      console.log(user, user.password);
-      if (!user) { return cb(null, false); }
-      // if (user.password != password) { return cb(null, false); }
-      // return cb(null, user);
-      return bcrypt.compareAsync(password, user.password)
-      .then(function(res) {
-        if(!res) return cb(null, false);
-        return cb(null, user);
-      });
-    })
-    .catch(cb);
-}));
 
-passport.serializeUser(function(user, cb) {
-  console.log('serializeUser', user);
-  cb(null, Object.assign({}, user));
-});
-
-passport.deserializeUser(function(user, cb) {
-  // console.log('deserializeUser #1', id);
-  // // db.users.findById(id, function (err, user) {
-  // connection.query("SELECT * FROM user WHERE id = " + id)
-  // .then(function(users) {
-  //   var user = users[0];
-  //   console.log('deserializeUser #2', user);
-  //   if (err) { return cb(err); }
-    cb(null, user);
-  // });
-});
 
 
 

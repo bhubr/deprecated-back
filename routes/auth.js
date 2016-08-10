@@ -1,11 +1,50 @@
 import express from 'express';
 import passport from 'passport';
+import bcrypt      from 'bcrypt';
 import AuthService from '../services/auth';
 import RestUtils   from '../services/rest-utils';
 import db          from '../services/db-utils';
 
 const Strategy = require('passport-local').Strategy;
 const router = express.Router();
+
+
+passport.use(new Strategy(
+  function(email, password, cb) {
+    console.log("SELECT * FROM user WHERE email = '" + email + "'");
+    db.getConnection().query("SELECT * FROM user WHERE email = '" + email + "'")
+    .then(function(users) {
+      var user = users[0];
+      console.log(user, user.password);
+      if (!user) { return cb(null, false); }
+      // if (user.password != password) { return cb(null, false); }
+      // return cb(null, user);
+      return bcrypt.compareAsync(password, user.password)
+      .then(function(res) {
+        if(!res) return cb(null, false);
+        return cb(null, user);
+      });
+    })
+    .catch(cb);
+}));
+
+passport.serializeUser(function(user, cb) {
+  console.log('serializeUser', user);
+  cb(null, Object.assign({}, user));
+});
+
+passport.deserializeUser(function(user, cb) {
+  console.log('deserializeUser', user);
+  // // db.users.findById(id, function (err, user) {
+  // connection.query("SELECT * FROM user WHERE id = " + id)
+  // .then(function(users) {
+  //   var user = users[0];
+  //   console.log('deserializeUser #2', user);
+  //   if (err) { return cb(err); }
+    cb(null, user);
+  // });
+});
+
 
 // middleware that is specific to this router
 router.use(function timeLog(req, res, next) {
