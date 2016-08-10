@@ -51,12 +51,10 @@ function errHandler(err) {
 
 
 passport.use(new Strategy(
-  function(username, password, cb) {
-    console.log("SELECT * FROM user WHERE user_name = '" + username + "'");
-    connection.query("SELECT * FROM user WHERE user_name = '" + username + "'")
-    // db.users.findByUsername(username, function(err, user) {
+  function(email, password, cb) {
+    console.log("SELECT * FROM user WHERE email = '" + email + "'");
+    connection.query("SELECT * FROM user WHERE email = '" + email + "'")
     .then(function(users) {
-      // if (err) { return cb(err); }
       var user = users[0];
       console.log(user, user.password);
       if (!user) { return cb(null, false); }
@@ -111,9 +109,10 @@ app.get('/users/:id', function (req, res) {
 });
 
 
-app.post('/users', bodyParser.json(), function(req, res) {
+app.post('/auth/register', function(req, res) {
   const converter = RestUtils.DbRowsToJSON('user');
-  return auth.register(connection, req.body.data.attributes)
+  console.log(req.body);
+  return auth.register(connection, req.body)
   .then(converter)
   .then(function(users) {
     res.json({ data: users });
