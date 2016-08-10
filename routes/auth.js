@@ -1,12 +1,15 @@
 import express from 'express';
 import passport from 'passport';
 import bcrypt      from 'bcrypt';
+import Promise     from 'bluebird';
 import AuthService from '../services/auth';
 import RestUtils   from '../services/rest-utils';
 import db          from '../services/db-utils';
 
 const Strategy = require('passport-local').Strategy;
 const router = express.Router();
+
+bcrypt.compareAsync = Promise.promisify(bcrypt.compare);
 
 
 passport.use(new Strategy(

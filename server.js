@@ -1,6 +1,6 @@
 import Promise     from 'bluebird';
-import bcrypt      from 'bcrypt';
 import db          from './services/db-utils';
+import event       from './services/event-hub';
 import RestUtils   from './services/rest-utils';
 import express     from 'express';
 import passport    from 'passport';
@@ -16,8 +16,8 @@ var config     = require(__dirname + '/config.json');
 var app        = express();
 
 
-bcrypt.compareAsync = Promise.promisify(bcrypt.compare);
 
+event.init();
 db.init(config.db);
 
 app.use(cookieParser());
