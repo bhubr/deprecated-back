@@ -1,5 +1,9 @@
 import express from 'express';
 import passport from 'passport';
+import AuthService from '../services/auth';
+import RestUtils   from '../services/rest-utils';
+import db          from '../services/db-utils';
+
 const Strategy = require('passport-local').Strategy;
 const router = express.Router();
 
@@ -13,7 +17,7 @@ router.use(function timeLog(req, res, next) {
 router.post('/register', function(req, res) {
   const converter = RestUtils.DbRowsToJSON('user');
   console.log(req.body);
-  return AuthService.register(connection, req.body)
+  return AuthService.register(db.getConnection(), req.body)
   .then(converter)
   .then(function(users) {
     res.json({ data: users });

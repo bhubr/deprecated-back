@@ -1,11 +1,10 @@
 import Promise     from 'bluebird';
 import bcrypt      from 'bcrypt';
-import AuthService from './services/auth';
+import db          from './services/db-utils';
 import RestUtils   from './services/rest-utils';
 import express     from 'express';
 import passport    from 'passport';
 
-var mysql      = require('promise-mysql');
 var pluralize  = require('pluralize')
 var _          = require('lodash');
 var bodyParser = require('body-parser');
@@ -17,22 +16,15 @@ var config     = require(__dirname + '/config.json');
 var app        = express();
 
 var saltRounds = 10;
-// Instantiate Chance so it can be used
-// var Chance     = require('chance');
-// var chance     = new Chance();
 var connection;
 
 
 bcrypt.compareAsync = Promise.promisify(bcrypt.compare);
 
-mysql.createConnection(config.db).then(function(conn){
-    connection = conn;
-});
+db.init(config.db);
 
 app.use(cookieParser());
-// parse various different custom JSON types as JSON
-// Ember REST adapter uses bloody vnd.api+json, fuck it
-app.use(bodyParser.json({ type: 'application/*+json' }))
+app.use(bodyParser.json({ type: 'application/*+json' }))  // Ember adapter uses vnd.api+json
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
@@ -89,7 +81,7 @@ passport.deserializeUser(function(user, cb) {
 
 
 app.get('/users', function (req, res) {
-  connection.query('SELECT * FROM user')
+  db.getConnection().query('SELECT * FROM user')
   .then(RestUtils.DbRowsToJSON('user'))
   .then(function(users) {
     res.json({ data: users });
@@ -100,7 +92,7 @@ app.get('/users', function (req, res) {
 });
 
 app.get('/users/:id', function (req, res) {
-  connection.query('SELECT * FROM user WHERE id = ' + req.params.id)
+  db.getConnection().query('SELECT * FROM user WHERE id = ' + req.params.id)
   .then(RestUtils.DbRowsToJSON('user'))
   .then(function(users) {
     res.json({ data: users[0] });
@@ -112,7 +104,7 @@ app.get('/users/:id', function (req, res) {
 
 
 app.get('/activities', function(req, res) {
-  connection.query('SELECT name,slug,color FROM activity')
+  db.getConnection().query('SELECT name,slug,color FROM activity')
   .then(function(rows, fields) {
     // if (err) throw err;
 
