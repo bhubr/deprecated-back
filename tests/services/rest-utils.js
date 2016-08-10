@@ -1,3 +1,4 @@
+// mocha --compilers js:babel-core/register tests/services/rest-utils.js
 import Promise from 'bluebird';
 import RestUtils from '../../services/rest-utils';
 import chai from 'chai';
@@ -22,6 +23,18 @@ describe('REST utils', () => {
       'id': 666,
       'a-bloody-field': 'a bloody value',
       'another-field': 'another field'
+    });
+    converted.should.eql({
+      'a_bloody_field': 'a bloody value',
+      'another_field': 'another field'
+    });
+  });
+
+  it('lowerCamelCase to snake_case conversion', () => {
+    const converted = RestUtils.camelToSnake({
+      'id': 666,
+      'aBloodyField': 'a bloody value',
+      'anotherField': 'another field'
     });
     converted.should.eql({
       'a_bloody_field': 'a bloody value',

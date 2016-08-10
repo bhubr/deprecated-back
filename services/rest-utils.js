@@ -28,6 +28,19 @@ function dashHiToLo(row) {
   return output;
 }
 
+/**
+ * JSON API conversion (lowerCamelCase) <=> DB fields (snake_case)
+ */
+function camelToSnake(attributes) {
+  let output = {};
+  for (let k in attributes) {
+    if (k === 'id') continue;
+    const snake = _.snakeCase(k);
+    output[snake] = attributes[k];
+  }
+  return output;
+}
+
 function DbRowsToJSON(tableName) {
   return function(rows) {
     var plural = pluralize(tableName);
@@ -45,5 +58,6 @@ function DbRowsToJSON(tableName) {
 export default {
   dashLoToHi,
   dashHiToLo,
+  camelToSnake,
   DbRowsToJSON
 }

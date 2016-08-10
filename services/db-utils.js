@@ -1,7 +1,7 @@
-import mysql from 'promise-mysql';
-import _     from 'lodash';
+import mysql   from 'promise-mysql';
+import _       from 'lodash';
 import RestUtils from './rest-utils';
-
+import ORM from './orm';
 
 export default {
 
@@ -23,6 +23,7 @@ export default {
    */
   onConnectionReady: function(conn) {
     this.connection = conn;
+    return ORM.getModels();
   },
 
   /**

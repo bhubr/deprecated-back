@@ -1,10 +1,12 @@
-import express from 'express';
-import passport from 'passport';
+import express     from 'express';
+import passport    from 'passport';
 import bcrypt      from 'bcrypt';
 import Promise     from 'bluebird';
 import AuthService from '../services/auth';
 import RestUtils   from '../services/rest-utils';
 import db          from '../services/db-utils';
+import tokenUtil   from '../services/token';
+
 
 const Strategy = require('passport-local').Strategy;
 const router = express.Router();
@@ -56,7 +58,7 @@ router.use(function timeLog(req, res, next) {
 });
 
 // define the register route
-router.post('/register', function(req, res) {
+router.post('/register', (req, res) => {
   const converter = RestUtils.DbRowsToJSON('user');
   console.log(req.body);
   return AuthService.register(db.getConnection(), req.body)
@@ -72,7 +74,7 @@ router.post('/register', function(req, res) {
 // define the login route
 router.post('/login',
   passport.authenticate('local'),
-  function(req, res) {
+  (req, res) => {
     console.log('auth/login route');
     console.log(req.body);
     console.log(req.session);
@@ -80,6 +82,10 @@ router.post('/login',
     res.json({ user: req.session.passport.user });
   }
 );
+
+router.post('/passlost', (req, res) => {
+  const token = tokenUtil.gen();
+});
 
 // define the status route
 router.get('/status', function (req, res) {

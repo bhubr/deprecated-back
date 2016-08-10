@@ -1,4 +1,5 @@
 {
+  "debugMode": "true",
   "secureCookies": false,
   "db": {
     "host": "db_host",

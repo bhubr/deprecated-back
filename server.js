@@ -81,6 +81,10 @@ app.get('/activities', function(req, res) {
 
 app.use('/auth', require('./routes/auth'));
 
+if (config.debugMode) {
+  app.use('/debug', require('./routes/debug'));
+
+}
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
 });
