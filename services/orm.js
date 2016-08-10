@@ -2,6 +2,7 @@ import fs      from 'fs';
 import path    from 'path';
 import db      from './db-utils';
 import rest    from './rest-utils';
+
 // const scandirAsync = Promise.promisify(fs.readdir);
 const modelsDir = path.normalize(__dirname + '/../models');
 let models = {};
@@ -51,7 +52,7 @@ function ormize(modelName, modelDefinition) {
         console.log('ORM:create:' + modelName + "\n", query);
         return conn.query(query)
         .then(result => conn.query('SELECT * from ' + _modelName + ' WHERE id = ' + result.insertId))
-        .then(entries => entries[0]);
+        .then(entries => rest.snakeToCamel(entries[0]));
       },
   
       read: function(id) {

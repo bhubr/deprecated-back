@@ -1,12 +1,16 @@
 import Promise from 'bluebird';
-import DbUtils from '../../services/db-utils';
+import DB from '../../services/db-utils';
 import chai from 'chai';
+import config from '../../config';
+
 const should = chai.should();
+
+DB.init(config.db);
 
 describe('DB utils', () => {
 
   it('payload to SQL conversion', () => {
-    const sql = DbUtils.payloadToQuery('user', {
+    const sql = DB.payloadToQuery('user', {
       'id': 666,
       'a-bloody-string': 'a bloody string',
       'another-string': 'another string',
