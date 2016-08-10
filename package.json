@@ -12,6 +12,7 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.x",
     "express-session": "^1.14.0",
+    "handlebars": "^4.0.5",
     "lodash": "^4.14.1",
     "mailgun-js": "^0.7.11",
     "mysql": "^2.11.1",
