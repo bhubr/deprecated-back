@@ -38,11 +38,7 @@ function register(attributes) {
     }))
     .set('token')
     .get(({ user, token }) => {
-      console.log(user, token);
-      const link = 'http://localhost:4200/auth/confirm-email?token=' + token.value;
-      // event.hub().on('user:register', mailgun.sendEmail);
-      event.hub().emit('user:register', { user, token, link });
-      console.log('event emitted, return', user);
+      event.hub().emit('user:register', { user, token });
       return user;
     })
     .catch(err => { console.log(err); });

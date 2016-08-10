@@ -85,6 +85,10 @@ if (config.debugMode) {
   app.use('/debug', require('./routes/debug'));
 
 }
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
-});
+
+// console.log('OK im ready');
+// setTimeout(() => {
+  app.listen(3000, function () {
+    console.log('Example app listening on port 3000!');
+  });
+// }, 12000);
