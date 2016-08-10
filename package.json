@@ -18,7 +18,8 @@
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pluralize": "^3.0.0",
-    "promise-mysql": "^1.3.2"
+    "promise-mysql": "^1.3.2",
+    "store-chain": "^2.0.3"
   },
   "devDependencies": {
     "babel": "^6.5.2",

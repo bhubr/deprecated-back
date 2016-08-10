@@ -61,7 +61,7 @@ router.use(function timeLog(req, res, next) {
 router.post('/register', (req, res) => {
   const converter = RestUtils.DbRowsToJSON('user');
   console.log(req.body);
-  return AuthService.register(db.getConnection(), req.body)
+  return AuthService.register(req.body)
   .then(converter)
   .then(function(users) {
     res.json({ data: users });

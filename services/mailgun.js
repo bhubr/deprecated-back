@@ -5,17 +5,19 @@ console.log(conf);
 
 export default {
 
-  sendEmail: function(user) {
-    const token = tokenService.gen();
-    const link = 'http://localhost:4200/auth/confirm-email?token=' + token;
+  sendEmail: function(params) {
     const data = {
       from: 'MyApp <benoithubert@samples.mailgun.org>',
-      to: user.email, //'benoithubert@gmail.com',
+      to: params.user.email, // 'benoithubert@gmail.com',
       subject: 'Hello',
-      text: 'Testing some Mailgun \nWelcome, ' + user.email + ', you just registered to my new super app.\n' + link
+      text: 'Testing some Mailgun \nWelcome, ' + params.user.email + ', you just registered to my new super app.\n' + params.link
     };
 
+    console.log(data);
+    // return;
+
     mailgun.messages().send(data, function (error, body) {
+      console.log(error);
       console.log(body);
     });
   }

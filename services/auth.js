@@ -1,16 +1,23 @@
 /**
  * Auth service
  */
-import RestUtils from './rest-utils';
 import Promise   from 'bluebird';
 import bcrypt    from 'bcrypt';
+import chain     from 'store-chain';
+import RestUtils from './rest-utils';
 import DbUtils   from './db-utils';
+import tokenUtil from './token';
+import ORM       from './orm';
 import event     from './event-hub';
 import mailgun   from './mailgun';
 
 bcrypt.hashAsync = Promise.promisify(bcrypt.hash);
 
-function register(connection, attributes) {
+const User = ORM.getModels().user;
+const Token = ORM.getModels().token;
+event.init();
+
+function register(attributes) {
 
   // # of salt iterations
   const saltRounds = 10;
@@ -22,16 +29,21 @@ function register(connection, attributes) {
   return bcrypt.hashAsync(plainTextPassword, saltRounds)
   .then(hashedPassword => {
     attributes.password = hashedPassword;
-    const query = DbUtils.payloadToQuery('user', attributes);
-    console.log('Register user query:', query);
-    return connection.query(query)
-    .then(function(entry) {
-      return connection.query('SELECT * FROM user WHERE id=' + entry.insertId);
-    })
-    .then(users => {
+    return chain(User.create(attributes))
+    .set('user')
+    .then(user => Token.create({
+      value: tokenUtil.gen(32),
+      validity: 60,
+      userId: user.id,
+      usageFor: 'auth:confirm-email'
+    }))
+    .set('token')
+    .get(({ user, token }) => {
+      console.log(user, token);
+      const link = 'http://localhost:4200/auth/confirm-email?token=' + token.value;
       event.hub().on('user:register', mailgun.sendEmail);
-      event.hub().emit('user:register', users[0]);
-      return users;
+      event.hub().emit('user:register', { user, token, link });
+      return user;
     })
     .catch(err => { console.log(err); });
   })
