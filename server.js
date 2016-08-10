@@ -1,9 +1,10 @@
-import Promise   from 'bluebird';
-import bcrypt    from 'bcrypt';
-import auth      from './services/auth';
-import RestUtils from './services/rest-utils';
+import Promise     from 'bluebird';
+import bcrypt      from 'bcrypt';
+import AuthService from './services/auth';
+import RestUtils   from './services/rest-utils';
+import express     from 'express';
+import passport    from 'passport';
 
-var express    = require('express');
 var mysql      = require('promise-mysql');
 var pluralize  = require('pluralize')
 var _          = require('lodash');
@@ -11,7 +12,6 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var session    = require('express-session')
 
-var passport   = require('passport');
 var Strategy   = require('passport-local').Strategy;
 var config     = require(__dirname + '/config.json');
 var app        = express();
@@ -46,7 +46,6 @@ function errHandler(err) {
   console.log('** Error **');
   console.log(err);
 }
-
 
 
 
@@ -86,6 +85,9 @@ passport.deserializeUser(function(user, cb) {
   // });
 });
 
+
+
+
 app.get('/users', function (req, res) {
   connection.query('SELECT * FROM user')
   .then(RestUtils.DbRowsToJSON('user'))
@@ -109,36 +111,6 @@ app.get('/users/:id', function (req, res) {
 });
 
 
-app.post('/auth/register', function(req, res) {
-  const converter = RestUtils.DbRowsToJSON('user');
-  console.log(req.body);
-  return auth.register(connection, req.body)
-  .then(converter)
-  .then(function(users) {
-    res.json({ data: users });
-  })
-  .catch(function(err) {
-    console.log('Error', err);
-  });
-});
-
-app.post('/auth/login',
-  passport.authenticate('local'),
-  function(req, res) {
-    console.log('auth/login route');
-    console.log(req.body);
-    console.log(req.session);
-    delete req.session.passport.user.password;
-    res.json({ user: req.session.passport.user });
-  }
-);
-
-app.get('/auth/status', function (req, res) {
-  if (!req.session.passport) return res.status(401).send('Unauthorized');
-  res.json({ user: req.session.passport.user });
-});
-
-
 app.get('/activities', function(req, res) {
   connection.query('SELECT name,slug,color FROM activity')
   .then(function(rows, fields) {
@@ -151,6 +123,8 @@ app.get('/activities', function(req, res) {
   });
 
 });
+
+app.use('/auth', require('./routes/auth'));
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
