@@ -1,7 +1,6 @@
 import tokenService from './token';
 const conf = require('../config.json').mailgun;
 const mailgun = require('mailgun-js')(conf);
-console.log(conf);
 
 export default {
 

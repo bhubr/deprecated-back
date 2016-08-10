@@ -1,0 +1,3 @@
+{
+  "user:register": ["email/user/account-created", "email/admin/new-user"]
+}

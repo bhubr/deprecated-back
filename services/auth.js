@@ -15,7 +15,6 @@ bcrypt.hashAsync = Promise.promisify(bcrypt.hash);
 
 const User = ORM.getModels().user;
 const Token = ORM.getModels().token;
-event.init();
 
 function register(attributes) {
 
@@ -41,8 +40,9 @@ function register(attributes) {
     .get(({ user, token }) => {
       console.log(user, token);
       const link = 'http://localhost:4200/auth/confirm-email?token=' + token.value;
-      event.hub().on('user:register', mailgun.sendEmail);
+      // event.hub().on('user:register', mailgun.sendEmail);
       event.hub().emit('user:register', { user, token, link });
+      console.log('event emitted, return', user);
       return user;
     })
     .catch(err => { console.log(err); });
