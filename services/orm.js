@@ -33,42 +33,81 @@ function buildInsertQuery(tableName, modelAttrs) {
   for (let k in attributes) {
     const val = attributes[k];
     if (typeof val === 'number') sqlValues.push(val);
-    if (typeof val === 'boolean') sqlValues.push(val ? 'TRUE' : 'FALSE');
-    if (typeof val === 'string') sqlValues.push("'" + val.split("'").join("''") + "'");
-    if (typeof val === 'undefined') throw new Error('Field ' + k + ' has undefined value');
+    else if (typeof val === 'boolean') sqlValues.push(val ? 'TRUE' : 'FALSE');
+    else if (typeof val === 'string') sqlValues.push("'" + val.split("'").join("''") + "'");
+    else if (typeof val === 'undefined') throw new Error('Field ' + k + ' has undefined value');
   }
   sqlValues.push("'" + theDate + "'");
   sqlValues.push("'" + theDate + "'");
   return 'INSERT INTO ' + tableName + sqlFields + ' VALUES(' + sqlValues.join(',') + ')';
 }
 
+/**
+ * Convert a payload to a SQL query
+ */
+function buildUpdateQuery(tableName, id, modelAttrs) {
+  const attributes = rest.camelToSnake(modelAttrs);
+  // const fields = Object.keys(attributes);
+  // const sqlFields = '(' + fields.join(',') + ',updated_at)';
+  const theDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  let sqlValues = [];
+  for (let k in attributes) {
+    let val = attributes[k];
+    // if (typeof val === 'number') sqlValues.push(val);
+    if (typeof val === 'boolean') val = (val ? 'TRUE' : 'FALSE');
+    else if (typeof val === 'string') val = "'" + val.split("'").join("''") + "'";
+    else if (typeof val === 'undefined') throw new Error('Field ' + k + ' has undefined value');
+    sqlValues.push(k + '=' + val);
+  }
+  sqlValues.push("updated_at='" + theDate + "'");
+  return 'UPDATE ' + tableName + ' SET ' + sqlValues.join(',') + ' WHERE id = ' + id;
+}
 
 function ormize(modelName, modelDefinition) {
   return (_modelName => {
     return {
       create: function(values) {
         const conn = db.getConnection();
-        const query = buildInsertQuery(modelName, values);
-        console.log('ORM:create:' + modelName + "\n", query);
+        const query = buildInsertQuery(_modelName, values);
+        console.log('ORM:create:' + _modelName + "\n", query);
         return conn.query(query)
         .then(result => conn.query('SELECT * from ' + _modelName + ' WHERE id = ' + result.insertId))
         .then(entries => rest.snakeToCamel(entries[0]));
       },
   
       read: function(id) {
-        console.log('ORM:read:' + modelName);
+        const conn = db.getConnection();
+        const where = ' WHERE id = ' + id;
+        console.log('ORM:read:' + _modelName);
+        return conn.query('SELECT * from ' + _modelName + where)
+        .then(entries => {
+          if (entries.length === 0) return undefined;
+          return rest.snakeToCamel(entries[0]);
+        });
       },
 
       readAll: function() {
-        console.log('ORM:readAll:' + modelName);
+        const conn = db.getConnection();
+        console.log('ORM:readAll:' + _modelName);
+        return conn.query('SELECT * from ' + _modelName)
+        .then(entries => entries.map(rest.snakeToCamel));
+
       },
 
       update: function(id, values) {
-        console.log('ORM:update:' + modelName);
+        const conn = db.getConnection();
+        const query = buildUpdateQuery(_modelName, id, values);
+        console.log('ORM:update:' + _modelName + "\n", query);
+        return conn.query(query)
+        .then(result => conn.query('SELECT * from ' + _modelName + ' WHERE id = ' + id))
+        .then(entries => rest.snakeToCamel(entries[0]));
+        // .then(console.log);
       },
 
       delete: function(id) {
-        console.log('ORM:delete:' + modelName);
+        const conn = db.getConnection();
+        console.log('ORM:delete:' + _modelName);
+        return conn.query('DELETE from ' + _modelName + ' WHERE id = ' + id);
       }
     };
   })(modelName);
