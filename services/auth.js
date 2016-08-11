@@ -4,19 +4,17 @@
 import Promise   from 'bluebird';
 import bcrypt    from 'bcrypt';
 import chain     from 'store-chain';
-import RestUtils from './rest-utils';
-import DbUtils   from './db-utils';
 import tokenUtil from './token';
-import ORM       from './orm';
+import ORM       from 'ormist';
 import event     from './event-hub';
-import mailgun   from './mailgun';
 
 bcrypt.hashAsync = Promise.promisify(bcrypt.hash);
 
-const User = ORM.getModels().user;
-const Token = ORM.getModels().token;
-
 function register(attributes) {
+  console.log('### register');
+  console.log(ORM);
+  const User = ORM.getModels().user;
+  const Token = ORM.getModels().token;
 
   // # of salt iterations
   const saltRounds = 10;
@@ -41,11 +39,12 @@ function register(attributes) {
       event.hub().emit('user:register', { user, token });
       return user;
     })
-    .catch(err => { console.log(err); });
-  })
-  .catch(function(err) {
-    console.log('Err occured while encrypting pass:', err);
+    .catch(err => { console.log(err); console.log(err.stack); throw err; });
   });
+  // .catch(function(err) {
+    // console.log('Err occured while encrypting pass:', err);
+    // console.log(err.stack);
+  // });
 
 }
 

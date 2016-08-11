@@ -1,4 +1,7 @@
 {
+  "name": "sex-back",
+  "description": "Another Express.js boilerplate",
+  "version": "0.0.5",
   "scripts": {
     "start": "babel-node ./server"
   },
@@ -16,6 +19,8 @@
     "lodash": "^4.14.1",
     "mailgun-js": "^0.7.11",
     "mysql": "^2.11.1",
+    "ormist": "latest",
+    "ormist-mysql": "0.0.1",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "pluralize": "^3.0.0",

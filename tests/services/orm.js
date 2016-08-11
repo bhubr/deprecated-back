@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
-import DB from '../../services/db-utils';
-import ORM from '../../services/orm';
+// import DB from '../../services/db-utils';
+import ORM from 'ormist';
 import chai from 'chai';
 import tokenUtil from '../../services/token';
 import config from '../../config';

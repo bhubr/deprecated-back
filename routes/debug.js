@@ -1,6 +1,6 @@
 import express     from 'express';
 import Promise     from 'bluebird';
-import ORM         from '../services/orm';
+import ORM         from 'ormist';
 import tokenUtil   from '../services/token';
 
 const router = express.Router();

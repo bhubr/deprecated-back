@@ -2,10 +2,13 @@
   "debugMode": "true",
   "secureCookies": false,
   "db": {
-    "host": "db_host",
-    "user": "db_user",
-    "password": "db_pass",
-    "database": "db_name"
+    "driver": "mysql",
+    "settings": {
+      "host": "db_host",
+      "user": "db_user",
+      "password": "db_pass",
+      "database": "db_name"
+    }
   },
   "mailgun": {
     "domain": "sandboxXXXXX.mailgun.org",

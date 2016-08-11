@@ -4,9 +4,9 @@ import bcrypt      from 'bcrypt';
 import Promise     from 'bluebird';
 import AuthService from '../services/auth';
 import RestUtils   from '../services/rest-utils';
-import db          from '../services/db-utils';
+// import db          from '../services/db-utils';
 import tokenUtil   from '../services/token';
-
+import ORM         from 'ormist';
 
 const Strategy = require('passport-local').Strategy;
 const router = express.Router();
@@ -17,7 +17,8 @@ bcrypt.compareAsync = Promise.promisify(bcrypt.compare);
 passport.use(new Strategy(
   function(email, password, cb) {
     console.log("SELECT * FROM user WHERE email = '" + email + "'");
-    db.getConnection().query("SELECT * FROM user WHERE email = '" + email + "'")
+    console.log(ORM.db);
+    ORM.db.getConnection().query("SELECT * FROM user WHERE email = '" + email + "'")
     .then(function(users) {
       var user = users[0];
       console.log(user, user.password);
@@ -67,7 +68,7 @@ router.post('/register', (req, res) => {
     res.json({ data: users });
   })
   .catch(function(err) {
-    console.log('Error', err);
+    res.status(500).send('500 Internal Error: ' + err.message);
   });
 });
 
