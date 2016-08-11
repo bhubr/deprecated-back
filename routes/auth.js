@@ -41,24 +41,13 @@ passport.serializeUser(function(user, cb) {
 
 passport.deserializeUser(function(user, cb) {
   console.log('deserializeUser', user);
-  // // db.users.findById(id, function (err, user) {
-  // connection.query("SELECT * FROM user WHERE id = " + id)
-  // .then(function(users) {
-  //   var user = users[0];
-  //   console.log('deserializeUser #2', user);
-  //   if (err) { return cb(err); }
-    cb(null, user);
-  // });
+  cb(null, user);
 });
 
 
-// middleware that is specific to this router
-router.use(function timeLog(req, res, next) {
-  console.log('Time: ', Date.now());
-  next();
-});
-
-// define the register route
+/**
+ * register route
+ */
 router.post('/register', (req, res) => {
   // const converter = RestUtils.DbRowsToJSON('user');
   console.log(req.body);
@@ -73,7 +62,10 @@ router.post('/register', (req, res) => {
   });
 });
 
-// define the login route
+
+/**
+ * login route
+ */
 router.post('/login',
   passport.authenticate('local'),
   (req, res) => {
@@ -84,6 +76,19 @@ router.post('/login',
     res.json({ user: req.session.passport.user });
   }
 );
+
+
+/**
+ * logout route
+ */
+router.post('/logout', (req, res) => {
+  req.session.destroy(function(err) {
+    if (err) {
+      return res.status(500).send('500 Internal Error: ' + err.message);
+    }
+    res.json({ success: true });
+  });
+});
 
 router.post('/passlost', (req, res) => {
   const token = tokenUtil.gen();
