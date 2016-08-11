@@ -1,6 +1,6 @@
 // mocha --compilers js:babel-core/register test/services/rest-utils.js
 import Promise from 'bluebird';
-import RestUtils from '../../services/rest-utils';
+import RestUtils from '../../../services/rest-utils';
 import chai from 'chai';
 const should = chai.should();
 

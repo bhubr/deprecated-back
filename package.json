@@ -1,10 +1,10 @@
 {
   "name": "sex-back",
   "description": "Another Express.js boilerplate",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "scripts": {
     "start": "babel-node ./server",
-    "test": "node ./node_modules/mocha/bin/mocha test/bootstrap.test.js test/services/*.test.js"
+    "test": "node ./node_modules/mocha/bin/mocha test/bootstrap.test.js test/unit/**/*.test.js test/integration/*.test.js"
   },
   "dependencies": {
     "babel-cli": "^6.11.4",
@@ -34,7 +34,9 @@
     "babel-eslint": "^6.1.2",
     "chai": "^3.5.0",
     "eslint": "^3.2.2",
-    "mocha": "^3.0.2"
+    "mocha": "^3.0.2",
+    "supertest": "^2.0.0",
+    "supertest-as-promised": "^3.2.0"
   },
   "babel": {
     "presets": [

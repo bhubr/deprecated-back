@@ -68,6 +68,7 @@ router.post('/register', (req, res) => {
     res.json({ data: users });
   })
   .catch(function(err) {
+    console.log(err.stack);
     res.status(500).send('500 Internal Error: ' + err.message);
   });
 });

@@ -7,4 +7,11 @@
 
 ## TODO
 
-* Introduce generic mechanism to insert models
+* Introduce generic mechanism to insert models [done]
+* Allow different setups when testing (e.g. port 3001, sqlite db, etc.)
+
+## Notes
+
+* Inspiration to setup the tests right:
+  * http://sailsjs.org/documentation/concepts/testing
+  * http://stackoverflow.com/questions/18941736/ensuring-express-app-is-running-before-each-mocha-test

@@ -1,8 +1,8 @@
 import Promise from 'bluebird';
-import auth from '../../services/auth';
+import auth from '../../../services/auth';
 // import DB from '../../services/db-utils';
 import chai from 'chai';
-import config from '../../config';
+import config from '../../../config';
 import ORM from 'ormist';
 
 const should = chai.should();
