@@ -40,7 +40,11 @@ export default {
   },
 
   init() {
-    if (this.eventHub !== null) throw new Error('Event hub already initialized!');
+    if (this.eventHub !== null) {
+      console.log('Event hub already initialized, skip!');
+      return;
+    }
+    console.log('Event hub initializing');
     
     this.eventHub = new EventEmitter;
     this.eventHub.on('event', () => {

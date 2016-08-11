@@ -3,7 +3,8 @@
   "description": "Another Express.js boilerplate",
   "version": "0.0.5",
   "scripts": {
-    "start": "babel-node ./server"
+    "start": "babel-node ./server",
+    "test": "node ./node_modules/mocha/bin/mocha test/bootstrap.test.js test/services/*.test.js"
   },
   "dependencies": {
     "babel-cli": "^6.11.4",
