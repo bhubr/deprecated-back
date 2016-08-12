@@ -11,8 +11,6 @@ import event     from './event-hub';
 bcrypt.hashAsync = Promise.promisify(bcrypt.hash);
 
 function register(attributes) {
-  console.log('### register');
-  console.log(ORM);
   const User = ORM.getModels().user;
   const Token = ORM.getModels().token;
 

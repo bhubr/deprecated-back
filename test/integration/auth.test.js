@@ -1,7 +1,8 @@
 import Promise from 'bluebird';
 import chai    from 'chai';
 import request from 'supertest-as-promised';
-import server from '../../server';
+import server  from '../../server';
+import ORM     from 'ormist';
 
 const should = chai.should();
 const agent = request.agent(server);
@@ -30,10 +31,16 @@ const userAttrs = {
 
 describe('Auth backend test', () => {
 
-  it('POST /auth/register (OK)', () => 
+  it('POST /auth/register (OK)', () =>
     api('post', '/auth/register', 200, userAttrs)
     .then(res => {
       res.body.should.have.property('data');
+      console.log('\n## res.body.data', res.body.data);
+      return res.body.data.id;
+    })
+    .then(id => ORM.getModels().user.read(id))
+    .then(user => {
+      // user.status.should.eql()
     })
     .catch(err => {
       console.log(err);
@@ -41,7 +48,7 @@ describe('Auth backend test', () => {
     })
   );
 
-  it('POST /auth/login (OK)', () => 
+  it.skip('POST /auth/login (OK)', () =>
     api('post', '/auth/login', 200, {
       username: userAttrs.email,
       password: userAttrs.password
@@ -57,7 +64,7 @@ describe('Auth backend test', () => {
     })
   );
 
-  it('POST /auth/logout (OK)', () => 
+  it.skip('POST /auth/logout (OK)', () =>
     api('post', '/auth/logout', 200, {})
     .then(res => {
       res.body.success.should.eql(true);

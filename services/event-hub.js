@@ -36,7 +36,7 @@ export default {
         this.eventHub.on(event, this.loadListener(listener));
       });
     }
-    console.log(this.loadedListeners);
+    // console.log(this.loadedListeners);
   },
 
   init() {

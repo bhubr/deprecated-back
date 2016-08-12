@@ -21,9 +21,6 @@ export default {
       html: template(params)
     };
 
-    console.log(data);
-    // return;
-
     mailgun.messages().send(data, function (error, body) {
       console.log(error);
       console.log(body);
