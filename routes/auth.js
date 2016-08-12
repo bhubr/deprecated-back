@@ -97,7 +97,10 @@ router.post('/passlost', (req, res) => {
 // define the status route
 router.get('/status', function (req, res) {
   console.log('\n\n### auth/status');
-  if (!req.session.passport) return res.status(401).send('Unauthorized');
+  if (!req.session.passport) return res.status(401).json({
+    code: 401,
+    message: 'Unauthorized'
+  });
   res.json({ user: req.session.passport.user });
 });
 

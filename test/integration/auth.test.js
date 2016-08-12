@@ -48,7 +48,7 @@ describe('Auth backend test', () => {
     })
   );
 
-  it.skip('POST /auth/login (OK)', () =>
+  it('POST /auth/login (OK)', () =>
     api('post', '/auth/login', 200, {
       username: userAttrs.email,
       password: userAttrs.password
@@ -64,7 +64,7 @@ describe('Auth backend test', () => {
     })
   );
 
-  it.skip('POST /auth/logout (OK)', () =>
+  it('POST /auth/logout (OK)', () =>
     api('post', '/auth/logout', 200, {})
     .then(res => {
       res.body.success.should.eql(true);
