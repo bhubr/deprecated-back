@@ -14,7 +14,7 @@ CREATE TABLE user (
 	last_name VARCHAR(48),
 	birth_date DATE,
 	password VARCHAR(128),
-	status ENUM('new', 'confirmed', 'inactive', 'banned', 'scheduled_for_deletion'),
+	status ENUM('new', 'confirmed', 'inactive', 'banned', 'scheduled_for_deletion') DEFAULT 'new',
 	created_at DATETIME,
 	updated_at DATETIME
 );
