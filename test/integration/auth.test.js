@@ -40,7 +40,7 @@ describe('Auth backend test', () => {
     })
     .then(id => ORM.getModels().user.read(id))
     .then(user => {
-      // user.status.should.eql()
+      user.status.should.eql('new');
     })
     .catch(err => {
       console.log(err);

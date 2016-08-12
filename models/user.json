@@ -4,5 +4,6 @@
   "firstName": "string",
   "lastName": "string",
   "birthDate": "string",
-  "password": "string"
+  "password": "string",
+  "status": "string"
 }
