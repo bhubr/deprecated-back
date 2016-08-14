@@ -3,6 +3,7 @@ import chai    from 'chai';
 import request from 'supertest-as-promised';
 import server  from '../../server';
 import ORM     from 'ormist';
+import chain   from 'store-chain';
 
 const should = chai.should();
 const agent = request.agent(server);
@@ -32,25 +33,44 @@ const userAttrs = {
 describe('Auth backend test', () => {
 
   it('POST /auth/register (OK)', () =>
-    api('post', '/auth/register', 200, userAttrs)
+    chain(api('post', '/auth/register', 200, userAttrs))
     .then(res => {
       res.body.should.have.property('data');
-      console.log('\n## res.body.data', res.body.data);
+      // console.log('\n## res.body.data', res.body.data);
       return res.body.data.id;
     })
     .then(id => ORM.getModels().user.read(id))
+    .set('user')
     .then(user => {
       user.status.should.eql('new');
     })
+    .then(() => ORM.getModels().token.latest())
+    .set('token')
+    .get(({ user, token }) => {
+      console.log(token);
+      token.userId.should.eql(user.id);
+      token.used.should.eql(0);
+    })
+    // Query on /auth/status should be OK
+    .then(() => api('get', '/auth/status', 200))
+    .get(({ token }) => api('post', '/auth/confirm-email', 200, { token: token.value }))
+    .then(() => ORM.getModels().user.latest())
+    .set('user')
+    .then(() => ORM.getModels().token.latest())
+    .set('token')
+    .get(({ user, token }) => {
+      user.status.should.equal('confirmed');
+      token.used.should.eql(1);
+    })
     .catch(err => {
-      console.log(err);
+      // console.log(err);
       throw err;
     })
   );
 
-  it('POST /auth/login (OK)', () =>
+  it.skip('POST /auth/login (OK)', () =>
     api('post', '/auth/login', 200, {
-      username: userAttrs.email,
+      email: userAttrs.email,
       password: userAttrs.password
     })
     .then(res => {
@@ -64,7 +84,7 @@ describe('Auth backend test', () => {
     })
   );
 
-  it('POST /auth/logout (OK)', () =>
+  it.skip('POST /auth/logout (OK)', () =>
     api('post', '/auth/logout', 200, {})
     .then(res => {
       res.body.success.should.eql(true);

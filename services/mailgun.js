@@ -12,7 +12,6 @@ const template = Handlebars.compile(templateSrc.toString());
 export default {
 
   send: function(params) {
-    console.log(params);
     const data = {
       from: 'MyApp <benoithubert@samples.mailgun.org>',
       to: params.recipient, // 'benoithubert@gmail.com',

@@ -29,7 +29,7 @@ export default {
   },
 
   bindListeners() {
-    console.log(this.eventListenersMap);
+    // console.log(this.eventListenersMap);
     for (const event in this.eventListenersMap) {
       const listeners = this.eventListenersMap[event];
       listeners.forEach(listener => {
