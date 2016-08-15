@@ -29,14 +29,12 @@ export default {
   },
 
   bindListeners() {
-    // console.log(this.eventListenersMap);
     for (const event in this.eventListenersMap) {
       const listeners = this.eventListenersMap[event];
       listeners.forEach(listener => {
         this.eventHub.on(event, this.loadListener(listener));
       });
     }
-    // console.log(this.loadedListeners);
   },
 
   init() {
@@ -50,7 +48,7 @@ export default {
     this.eventHub.on('event', () => {
       console.log('an event occurred!', arguments, this);
     });
-    this.bindListeners();
+    if (process.env.NODE_TEST !== 'test') this.bindListeners();
   },
 
   hub() {

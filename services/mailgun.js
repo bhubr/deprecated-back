@@ -2,7 +2,7 @@ import tokenService from './token';
 import fs from 'fs';
 import path    from 'path';
 import Handlebars from 'handlebars';
-const conf = require('../config.json').mailgun;
+const conf = config.mailgun;
 const mailgun = require('mailgun-js')(conf);
 
 const templatePath = path.normalize(__dirname + '/../resources/templates/email.html');

@@ -7,7 +7,8 @@ import session      from 'express-session';
 import ORM          from 'ormist';
 import event        from './services/event-hub';
 
-const config = require(__dirname + '/config.json');
+const runEnv = process.env.NODE_ENV || 'dev';
+global.config = require(__dirname + '/config/' + runEnv + '.json');
 const app    = express();
 
 event.init();
@@ -36,9 +37,8 @@ Promise.all([
   ORM.init(config.db.driver, config.db.settings)
 ])
 .then(() => {
-  app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
-    console.log('## server');
+  app.listen(config.port, function () {
+    console.log('Example app listening on port ' + config.port);
     event.hub().emit('app:ready');
   });
 });

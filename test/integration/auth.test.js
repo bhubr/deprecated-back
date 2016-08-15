@@ -91,7 +91,7 @@ describe('Auth backend test', () => {
 
   it('POST /auth/register (OK) then confirm email (KO token expired)', () =>
     registerUser()
-    .then(({ user, token }) => ORM.getModels().token.update(token.id, { createdAt: '2016-08-15' }))
+    .then(({ user, token }) => ORM.getModels().token.update(token.id, { createdAt: '2010-08-15' }))
     .then(token => confirmEmail(token.value, 400, 'new', 0))
   );
 

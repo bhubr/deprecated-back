@@ -1,6 +1,7 @@
 {
   "debugMode": "true",
   "secureCookies": false,
+  "port": 3000,
   "db": {
     "driver": "mysql",
     "settings": {

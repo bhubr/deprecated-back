@@ -6,7 +6,7 @@
   "repository": "https://github.com/t1z/sex-back",
   "scripts": {
     "start": "babel-node ./server",
-    "test": "node ./node_modules/mocha/bin/mocha test/bootstrap.test.js test/unit/**/*.test.js test/integration/*.test.js"
+    "test": "export NODE_ENV=test && node ./node_modules/mocha/bin/mocha test/bootstrap.test.js test/unit/**/*.test.js test/integration/*.test.js"
   },
   "dependencies": {
     "babel-cli": "^6.11.4",
