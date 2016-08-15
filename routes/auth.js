@@ -107,7 +107,7 @@ router.post('/confirm-email', (req, res) => {
   .then(token => res.status(200).json({ token: token }))
   .catch(err => {
     console.log('### Error', err, err.stack);
-    res.status(400).json({ success: false, message: 'Token not found' });
+    res.status(400).json({ success: false, message: err.message });
   })
 });
 
