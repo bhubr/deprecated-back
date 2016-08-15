@@ -20,7 +20,6 @@ function register(attributes) {
   // Get password from attributes
   const plainTextPassword = attributes.password;
 
-  console.log('## args to bcrypt', attributes, plainTextPassword, saltRounds);
   // Generate a hash
   return bcrypt.hashAsync(plainTextPassword, saltRounds)
   .then(hashedPassword => {

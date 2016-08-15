@@ -30,43 +30,72 @@ const userAttrs = {
   password: 'SecurePass123$$'
 };
 
-describe('Auth backend test', () => {
+/**
+ * Should be tested:
+ *  - Register:
+ *      - Happy path
+ *      - Happy path but wrong email confirmation
+ *      - Invalid/empty params
+ *  - Login:
+ *  - Logout
+ *  - Passlost
+ */
 
-  it('POST /auth/register (OK)', () =>
-    chain(api('post', '/auth/register', 200, userAttrs))
+function registerUser() {
+  let user;
+  let token;
+  return api('post', '/auth/register', 200, userAttrs)
     .then(res => {
       res.body.should.have.property('data');
-      // console.log('\n## res.body.data', res.body.data);
       return res.body.data.id;
     })
     .then(id => ORM.getModels().user.read(id))
-    .set('user')
-    .then(user => {
+    .then(_user => {
+      user = _user;
       user.status.should.eql('new');
     })
     .then(() => ORM.getModels().token.latest())
-    .set('token')
-    .get(({ user, token }) => {
-      console.log(token);
+    .then(_token => {
+      token = _token;
       token.userId.should.eql(user.id);
       token.used.should.eql(0);
     })
     // Query on /auth/status should be OK
     .then(() => api('get', '/auth/status', 200))
-    .get(({ token }) => api('post', '/auth/confirm-email', 200, { token: token.value }))
+    .then(() => ({ user, token }));
+}
+
+function confirmEmail(tokenValue, expectedHttpStatus, expextedUserStatus, expectedTokenStatus) {
+  return chain(api('post', '/auth/confirm-email', expectedHttpStatus, { token: tokenValue }))
     .then(() => ORM.getModels().user.latest())
     .set('user')
     .then(() => ORM.getModels().token.latest())
     .set('token')
     .get(({ user, token }) => {
-      user.status.should.equal('confirmed');
-      token.used.should.eql(1);
+      user.status.should.equal(expextedUserStatus);
+      token.used.should.eql(expectedTokenStatus);
     })
-    .catch(err => {
-      // console.log(err);
-      throw err;
-    })
+}
+
+describe('Auth backend test', () => {
+
+  it('POST /auth/register (OK) then confirm email (OK)', () =>
+    registerUser()
+    .then(({ user, token }) => confirmEmail(token.value, 200, 'confirmed', 1))
   );
+
+  it('POST /auth/register (OK) then confirm email (KO bad token)', () =>
+    registerUser()
+    .then(({ user, token }) => confirmEmail(token.value + 'xyz', 400, 'new', 0))
+  );
+
+  it('POST /auth/register (OK) then confirm email (KO token expired)', () =>
+    registerUser()
+    .then(({ user, token }) => ORM.getModels().token.update(token.id, { createdAt: '2016-08-15' }))
+    .then(token => confirmEmail(token.value, 400, 'new', 0))
+  );
+
+
 
   it.skip('POST /auth/login (OK)', () =>
     api('post', '/auth/login', 200, {
