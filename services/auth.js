@@ -9,8 +9,9 @@ import ORM       from 'ormist';
 import event     from './event-hub';
 
 bcrypt.hashAsync = Promise.promisify(bcrypt.hash);
-
+console.log(ORM);
 function register(attributes) {
+  console.log(attributes);
   const User = ORM.getModels().user;
   const Token = ORM.getModels().token;
 

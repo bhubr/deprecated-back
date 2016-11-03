@@ -25,13 +25,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-app.use('/activities', require('./routes/activities'));
+// sapp.use('/activities', require('./routes/activities'));
 app.use('/users', require('./routes/users'));
 app.use('/auth', require('./routes/auth'));
 
-if (config.debugMode) {
-  app.use('/debug', require('./routes/debug'));
-}
+// if (config.debugMode) {
+//   app.use('/debug', require('./routes/debug'));
+// }
 
 Promise.all([
   ORM.init(config.db.driver, config.db.settings)

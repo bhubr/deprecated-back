@@ -8,6 +8,7 @@ import RestUtils   from '../services/rest-utils';
 // import db          from '../services/db-utils';
 import tokenUtil   from '../services/token';
 import ORM         from 'ormist';
+import AuthController from '../controllers/auth';
 
 const Strategy = require('passport-local').Strategy;
 const router = express.Router();
@@ -47,21 +48,13 @@ passport.deserializeUser(function(user, cb) {
 });
 
 
+
+
+
 /**
  * register route
  */
-router.post('/register', (req, res) => {
-  return chain(AuthService.register(Object.assign({}, req.body)))
-  .set('user')
-  .then(() => new Promise((resolve, reject) => {
-    return (passport.authenticate('local'))(req, res, resolve);
-  }))
-  .get(({ user }) => res.json({ data: user }))
-  .catch(function(err) {
-    console.log(err.stack);
-    res.status(500).send('500 Internal Error: ' + err.message);
-  });
-});
+router.post('/register', AuthController.postRegister);
 
 
 /**
